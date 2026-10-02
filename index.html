@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Anime Battle Online</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#08090f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box}
+:root{
+ --bg:#08090f;--panel:#11131d;--panel2:#181b28;--line:#2b3042;
+ --text:#f5f7ff;--muted:#9da5bd;--accent:#7c5cff;--green:#34d399;
+}
+body{margin:0;background:radial-gradient(circle at top,#17152b 0,#08090f 42%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+button,input{font:inherit}
+button{border:0;color:white;cursor:pointer}
+#app{max-width:760px;margin:auto;min-height:100vh;padding-bottom:86px}
+header{padding:18px 16px 8px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:24px;letter-spacing:1px}
+.logo span{color:#8d73ff}
+.coins{background:#171a26;border:1px solid var(--line);padding:8px 12px;border-radius:14px;font-weight:800}
+.screen{padding:14px 16px}
+.card{background:rgba(17,19,29,.94);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 8px 30px #0004}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:28px;margin-bottom:6px}
+h2{font-size:21px}
+.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.menuBtn,.bigBtn{padding:18px;border-radius:17px;background:linear-gradient(135deg,#242039,#171927);border:1px solid var(--line);font-weight:800;text-align:left}
+.bigBtn{width:100%;text-align:center;background:linear-gradient(135deg,#795dff,#4e36c7);margin-top:8px}
+.smallBtn{padding:10px 13px;border-radius:12px;background:#24283a;border:1px solid var(--line)}
+.danger{background:#4b202b}
+.roulette{min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.orb{width:115px;height:115px;border-radius:50%;display:grid;place-items:center;font-size:48px;background:radial-gradient(circle,#fff,#a996ff 20%,#5137c9 55%,#151024 72%);box-shadow:0 0 55px #765dff99;margin-bottom:16px}
+.resultName{font-size:27px;font-weight:900}
+.rarity{font-weight:900;margin:6px 0 14px}
+.comum{color:#9aa0ad}.incomum{color:#4ea7ff}.raro{color:#b16cff}.epico{color:#ffd84d}.lendario{color:#ff6262}.mitico{color:#ddd}
+.list{display:grid;gap:9px}
+.item{display:flex;align-items:center;justify-content:space-between;background:#151824;border:1px solid var(--line);padding:12px;border-radius:14px}
+.badge{font-size:12px;padding:5px 8px;border-radius:8px;background:#25293a}
+.charCard{padding:14px;border-radius:16px;border:1px solid var(--line);background:#151824}
+.charTop{display:flex;justify-content:space-between;gap:10px}
+.skill{margin-top:8px;padding:9px;border-radius:11px;background:#0e1018}.skillCard{border:1px solid var(--line);border-radius:15px;padding:10px;background:#151824}.skillBtn{width:100%;text-align:left;padding:13px;border-radius:12px;background:#24283a}.locked{opacity:.55;filter:grayscale(.5)}.raritySection{margin-bottom:10px}.rarityHeader{display:flex;justify-content:space-between;align-items:center;padding:13px;border-radius:14px;background:#151824;border:1px solid var(--line);cursor:pointer}.charGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:8px}.miniChar{padding:12px;border-radius:14px;background:#0f121b;border:1px solid var(--line);cursor:pointer}.profileOrb{width:90px;height:90px;border-radius:50%;display:grid;place-items:center;margin:0 auto 8px;background:radial-gradient(circle,#fff,#8b79ff 20%,#4030a5 60%,#111326 80%);font-size:32px;font-weight:900}.upgrade{padding:10px;border-radius:12px;background:#0d1018;border:1px solid var(--line);margin-top:8px}.winRow{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#151824;border:1px solid var(--line);border-radius:12px;margin-top:7px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0d0f17eF;border-top:1px solid var(--line);backdrop-filter:blur(12px);display:flex;justify-content:center;z-index:5}
+.navin{max-width:760px;width:100%;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{background:transparent;padding:13px 4px;color:var(--muted);font-size:12px}
+nav button.active{color:#fff}
+input{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:#0d0f17;color:white;outline:none;margin:6px 0 10px}
+.back{margin-bottom:12px}
+.hidden{display:none}
+.battleHp{height:16px;background:#292d3c;border-radius:99px;overflow:hidden;margin:8px 0}
+.hp{height:100%;background:linear-gradient(90deg,#34d399,#16a66f);transition:.3s}
+.battleGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.log{height:150px;overflow:auto;background:#0b0d14;border:1px solid var(--line);padding:10px;border-radius:12px;font-size:13px}
+.toast{position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#202437;border:1px solid var(--line);padding:12px 16px;border-radius:13px;z-index:20;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1}
+
+.battleArena{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center;margin:18px 0 20px}
+.fighter{text-align:center;position:relative;min-height:205px}
+.fighterName{font-weight:900;font-size:16px;margin-bottom:8px;min-height:20px}
+.fighterOrb{width:150px;height:150px;border-radius:50%;margin:auto;display:grid;place-items:center;position:relative;background:radial-gradient(circle at 35% 30%,#fff,#8b79ff 18%,#4030a5 58%,#111326 78%);border:3px solid #8170ff;box-shadow:0 0 35px #6d5cff66;transition:.25s;overflow:visible}
+.enemyOrb{background:radial-gradient(circle at 35% 30%,#fff,#ff6b82 18%,#a52e4d 58%,#170f18 78%);border-color:#ff5f78;box-shadow:0 0 35px #ff496655}
+.orbHp{font-size:20px;font-weight:900;text-shadow:0 2px 6px #000}
+.orbMax{font-size:11px;color:#d9dded;margin-top:2px}
+.effect{position:absolute;inset:-18px;display:grid;place-items:center;font-size:72px;pointer-events:none;opacity:0;z-index:3}
+.effect.show{animation:hitEffect .62s ease-out}
+.effect.slash.show{animation:slashEffect .55s ease-out}
+.effect.fire.show{animation:fireEffect .65s ease-out}
+.effect.ice.show{animation:iceEffect .65s ease-out}
+.effect.lightning.show{animation:lightningEffect .55s ease-out}
+.effect.blood.show{animation:bloodEffect .6s ease-out}
+.effect.energy.show{animation:energyEffect .6s ease-out}
+@keyframes hitEffect{0%{opacity:0;transform:scale(.3)}25%{opacity:1;transform:scale(1.2)}100%{opacity:0;transform:scale(1.55) rotate(12deg)}}
+@keyframes slashEffect{0%{opacity:0;transform:scale(.4) rotate(-35deg)}25%{opacity:1;transform:scale(1.15) rotate(-15deg)}100%{opacity:0;transform:scale(1.6) rotate(20deg)}}
+@keyframes fireEffect{0%{opacity:0;transform:scale(.3) translateY(25px)}25%{opacity:1;transform:scale(1.15) translateY(0)}100%{opacity:0;transform:scale(1.6) translateY(-18px)}}
+@keyframes iceEffect{0%{opacity:0;transform:scale(.4)}30%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(1.7) rotate(20deg)}}
+@keyframes lightningEffect{0%{opacity:0;transform:scale(.3)}15%{opacity:1;transform:scale(1.2)}35%{opacity:.5;transform:scale(.9)}55%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes bloodEffect{0%{opacity:0;transform:scale(.3)}25%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(1.7) translateY(15px)}}
+@keyframes energyEffect{0%{opacity:0;transform:scale(.2) rotate(0)}30%{opacity:1;transform:scale(1.2) rotate(120deg)}100%{opacity:0;transform:scale(1.7) rotate(300deg)}}
+.fighter.shake{animation:orbShake .38s ease-in-out}
+@keyframes orbShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-9px)}50%{transform:translateX(9px)}75%{transform:translateX(-6px)}}
+.critGame{margin-top:14px;background:#0b0d14;border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+.critTrack{height:30px;border-radius:8px;background:#25293a;position:relative;overflow:hidden;margin:12px 0;border:1px solid #3a4055}
+.critZone{position:absolute;top:0;bottom:0;left:41%;width:18%;background:#ffd43b;box-shadow:0 0 16px #ffd43b99}
+.critLine{position:absolute;top:-4px;bottom:-4px;width:4px;background:#fff;box-shadow:0 0 12px #fff;left:0}
+.critBtn{width:100%;padding:12px;border-radius:12px;background:#6d50ff;font-weight:900}
+.damageFloat{position:absolute;left:50%;top:35%;font-size:25px;font-weight:900;color:#fff;text-shadow:0 2px 5px #000;pointer-events:none;z-index:4}
+.damageFloat.show{animation:floatDamage .75s ease-out}
+@keyframes floatDamage{0%{opacity:0;transform:translate(-50%,15px) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-55px) scale(1.15)}}
+
+.miniMeter,.chargeMeter{height:18px;background:#25293a;border:1px solid #3a4055;border-radius:99px;overflow:hidden;margin:10px 0}.miniMeter i,.chargeMeter i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#34d399);transition:.15s}.targetField{height:120px;position:relative;border:1px dashed #3a4055;border-radius:12px;background:radial-gradient(circle,#181b2a,#0b0d14);overflow:hidden}.targetDot{position:absolute;left:40%;top:35%;width:42px;height:42px;border-radius:50%;background:#ffd43b;color:#16120a;font-weight:900;box-shadow:0 0 25px #ffd43b;transform:translate(-50%,-50%);transition:.15s}.targetDot.targetHit{animation:targetHit .2s ease-out}.dodgeRow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.dodgeRow button,.sequenceBtns button{padding:12px;border-radius:12px;background:#24283a;border:1px solid #3a4055}.rhythmPulse{width:42px;height:42px;margin:14px auto;border-radius:50%;background:#7c5cff;box-shadow:0 0 25px #7c5cff;transition:.07s}.techShield{position:absolute;inset:8%;border:5px solid #a855f7;border-radius:50%;opacity:0;transform:scale(.4)}.techShield.go{animation:shieldFx .8s ease-out forwards}.techImpact,.techHeart,.techWheel,.techSmoke,.techLightning{position:absolute;inset:0;display:grid;place-items:center;font-size:68px;opacity:0}.techImpact.go{animation:impactFx .5s ease-out forwards}.techHeart.go{animation:heartFx .7s ease-out forwards}.techWheel.go{animation:wheelFx .8s ease-out forwards}.techSmoke.go{animation:smokeFx .8s ease-out forwards}.techLightning.go{animation:lightningEffect .6s ease-out forwards}.techBurst.red{background:radial-gradient(circle,#ff3030,transparent 65%)}.techBurst.crimson{background:radial-gradient(circle,#ff2d55,#7f1d1d,transparent 68%)}.techBurst.fire{background:radial-gradient(circle,#ffd166,#f97316,#dc2626,transparent 68%)}.techBurst.ice{background:radial-gradient(circle,#d9faff,#38bdf8,transparent 68%)}.techSlash.blood{color:#ff355d}.techBalls b:nth-child(1){background:#3d7cff}.techBalls b:nth-child(2){background:#ff4040;left:52%;top:38%}.techBalls b:nth-child(3){background:#a855f7;left:42%;top:43%;width:58px;height:58px;box-shadow:0 0 30px #a855f7}.techBalls.go{animation:ballsFx .8s ease-out forwards}.techClaw.go{animation:clawFx .55s ease-out forwards}.techProjectile.go{animation:projGo .48s ease-out forwards}.techCuts.go{animation:cutsFx .7s ease-out forwards}.techBurst.go{animation:burstFx .6s ease-out forwards}.techSmoke.go{animation:smokeFx .8s ease-out forwards}@keyframes shieldFx{0%{opacity:0;transform:scale(.3)}35%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.35)}}@keyframes impactFx{0%{opacity:0;transform:scale(.2) rotate(-20deg)}35%{opacity:1;transform:scale(1.3)}100%{opacity:0;transform:scale(1.7) rotate(20deg)}}@keyframes heartFx{0%{opacity:0;transform:scale(.3)}35%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.7) translateY(-15px)}}@keyframes wheelFx{0%{opacity:0;transform:scale(.2) rotate(0)}35%{opacity:1;transform:scale(1.2) rotate(180deg)}100%{opacity:0;transform:scale(1.5) rotate(540deg)}}@keyframes smokeFx{0%{opacity:0;transform:scale(.3)}40%{opacity:.9;transform:scale(1.2)}100%{opacity:0;transform:scale(1.7)}}@keyframes targetHit{50%{transform:translate(-50%,-50%) scale(1.6);box-shadow:0 0 45px #fff}100%{transform:translate(-50%,-50%) scale(.2);opacity:0}}
+@media(max-width:520px){.fighterOrb{width:125px;height:125px}.orbHp{font-size:17px}.fighter{min-height:180px}}
+
+.techFx{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:visible}.techProjectile{position:absolute;left:8%;top:50%;font-size:42px;transform:translateY(-50%);opacity:0}.techProjectile.go{animation:projGo .48s ease-out forwards}.techProjectile.big{font-size:64px}.techSlash{position:absolute;inset:8%;opacity:0;font-size:62px;text-align:center;line-height:1}.techSlash.go{animation:slashFx .5s ease-out forwards}.techBurst{position:absolute;inset:15%;border-radius:50%;opacity:0;transform:scale(.2)}.techBurst.go{animation:burstFx .55s ease-out forwards}.techCuts{position:absolute;inset:0;opacity:0}.techCuts.go{animation:cutsFx .7s ease-out forwards}.techCuts i{position:absolute;width:75%;height:4px;background:currentColor;left:12%;transform:rotate(var(--r));top:var(--t);box-shadow:0 0 10px currentColor}.techCuts i:nth-child(2){--r:-35deg;--t:25%}.techCuts i:nth-child(3){--r:18deg;--t:42%}.techCuts i:nth-child(4){--r:-62deg;--t:58%}.techCuts i:nth-child(5){--r:47deg;--t:70%}.techClaw{position:absolute;inset:5%;opacity:0;font-size:75px;text-align:center}.techClaw.go{animation:clawFx .5s ease-out forwards}.techBalls{position:absolute;inset:0;opacity:0}.techBalls.go{animation:ballsFx .8s ease-out forwards}.techBalls b{position:absolute;border-radius:50%;width:48px;height:48px;top:38%;left:30%}.techBalls b:nth-child(2){left:55%}.techBalls b:nth-child(3){left:43%;top:40%;opacity:0}.techBalls.go b:nth-child(1){animation:ballL .7s forwards}.techBalls.go b:nth-child(2){animation:ballR .7s forwards}.techBalls.go b:nth-child(3){animation:ballPurple .8s .35s forwards}
+@keyframes projGo{0%{left:8%;opacity:0;transform:translateY(-50%) scale(.7)}15%{opacity:1}100%{left:88%;opacity:0;transform:translateY(-50%) scale(1.2)}}@keyframes slashFx{0%{opacity:0;transform:scale(.5) rotate(-25deg)}35%{opacity:1}100%{opacity:0;transform:scale(1.25) rotate(20deg)}}@keyframes burstFx{0%{opacity:0;transform:scale(.2)}35%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(1.5)}}@keyframes cutsFx{0%{opacity:0;transform:scale(.6)}25%{opacity:1}100%{opacity:0;transform:scale(1.05)}}@keyframes clawFx{0%{opacity:0;transform:translateX(-25px) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateX(25px) scale(1.25)}}@keyframes ballsFx{0%{opacity:1}100%{opacity:1}}@keyframes ballL{to{left:43%}}@keyframes ballR{to{left:43%}}@keyframes ballPurple{0%{opacity:0;transform:scale(.3)}30%{opacity:1}100%{opacity:0;left:88%;transform:scale(1.4)}}
+ .onlinePulse{animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.55}}
+
+@media(max-width:520px){
+ body{min-width:0;overflow-x:hidden}#app{width:100%;padding-bottom:78px}.screen{padding:10px 10px}.card{border-radius:16px;padding:13px}.grid{grid-template-columns:1fr 1fr;gap:8px}.menuBtn,.bigBtn{min-height:54px;padding:14px 10px}.bigBtn{font-size:15px}.battleGrid{grid-template-columns:1fr}.battleArena{gap:8px;margin:12px 0 14px}.fighterOrb{width:112px;height:112px}.fighter{min-height:158px}.fighterName{font-size:14px}.orbHp{font-size:15px}.orbMax{font-size:9px}.skillBtn{min-height:64px;padding:11px;font-size:14px}.log{height:120px}.charGrid{grid-template-columns:1fr 1fr}.navin{grid-template-columns:repeat(4,1fr)}nav button{padding:11px 2px;font-size:11px}.dodgeRow button,.sequenceBtns button{min-height:48px}.targetField{height:105px}.critBtn{min-height:48px}h1{font-size:24px}h2{font-size:19px}
+}
+@media(max-width:360px){.battleArena{gap:2px}.fighterOrb{width:96px;height:96px}.orbHp{font-size:13px}.menuBtn{font-size:13px}.navin button{font-size:10px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div class="logo">ANIME <span>BATTLE</span></div><div class="coins">🪙 <span id="coins">0</span></div></header>
+<main id="screen"></main>
+</div>
+<div id="toast" class="toast"></div>
+<nav><div class="navin">
+<button onclick="go('home')">🏠<br>Início</button>
+<button onclick="go('roulette')">🎰<br>Roletar</button>
+<button onclick="go('inventory')">🎒<br>Inventário</button>
+<button onclick="go('options')">⚙️<br>Opções</button>
+</div></nav>
+
+<script>
+const rarities=[
+ {id:'comum',name:'🟢 Comum',chance:50},
+ {id:'incomum',name:'🔵 Incomum',chance:27},
+ {id:'raro',name:'🟣 Raro',chance:13},
+ {id:'epico',name:'🟡 Épico',chance:7},
+ {id:'lendario',name:'🔴 Lendário',chance:2.5},
+ {id:'mitico',name:'⚫ Mítico',chance:.5}
+];
+
+const chars=[
+ {id:'miwa',name:'Kasumi Miwa',rarity:'comum',hp:4200,skills:[['Katana Simples',90,1],['Postura de Novo Estilo',180,2]]},
+ {id:'mai',name:'Mai Zenin',rarity:'comum',hp:4000,skills:[['Disparo',110,1],['Bala Amaldiçoada',230,3]]},
+ {id:'momo',name:'Momo Nishimiya',rarity:'comum',hp:3900,skills:[['Vassoura',80,1],['Voo Cortante',190,2]]},
+ {id:'ijichi',name:'Kiyotaka Ijichi',rarity:'comum',hp:3600,skills:[['Barreira',70,1],['Cortina',170,3]]},
+ {id:'junpei',name:'Junpei Yoshino',rarity:'comum',hp:4100,skills:[['Shikigami',100,1],['Veneno',210,3]]},
+ {id:'shoko',name:'Shoko Ieiri',rarity:'comum',hp:4300,skills:[['Golpe',70,1],['Técnica Reversa',150,3]]},
+ {id:'haruta',name:'Haruta Shigemo',rarity:'comum',hp:4000,skills:[['Espada',100,1],['Milagres',200,3]]},
+ {id:'remi',name:'Remi',rarity:'comum',hp:3500,skills:[['Ferrão',80,1],['Armadilha',180,2]]},
+ {id:'rin',name:'Rin Amai',rarity:'comum',hp:3800,skills:[['Açúcar',90,1],['Impulso Doce',190,2]]},
+ {id:'sasaki',name:'Setsuko Sasaki',rarity:'comum',hp:3700,skills:[['Ataque',75,1],['Investida',160,2]]},
+
+ {id:'toge',name:'Toge Inumaki',rarity:'incomum',hp:4700,skills:[['Fuja',140,1],['Exploda',300,3]]},
+ {id:'nobara',name:'Nobara Kugisaki',rarity:'incomum',hp:4800,skills:[['Martelo',150,1],['Boneca de Palha',330,3]]},
+ {id:'kamo',name:'Noritoshi Kamo',rarity:'incomum',hp:4900,skills:[['Flecha de Sangue',160,1],['Perfuração de Sangue',340,3]]},
+ {id:'mechamaru',name:'Kokichi Muta',rarity:'incomum',hp:5000,skills:[['Canhão',170,1],['Modo Absoluto',360,4]]},
+ {id:'maki',name:'Maki Zenin',rarity:'incomum',hp:5200,skills:[['Lança',170,1],['Arsenal Zenin',350,3]]},
+ {id:'nanami',name:'Kento Nanami',rarity:'incomum',hp:5400,skills:[['Golpe 7:3',180,1],['Hora Extra',390,4]]},
+ {id:'mei',name:'Mei Mei',rarity:'incomum',hp:5000,skills:[['Machado',160,1],['Corvo Negro',360,3]]},
+ {id:'kusakabe',name:'Atsuya Kusakabe',rarity:'incomum',hp:5100,skills:[['Iaido',170,1],['Domínio Simples',330,3]]},
+ {id:'todo',name:'Aoi Todo',rarity:'incomum',hp:5600,skills:[['Soco',180,1],['Boogie Woogie',350,3]]},
+ {id:'ino',name:'Takuma Ino',rarity:'incomum',hp:5000,skills:[['Máscara',150,1],['Bestas Auspiciosas',320,3]]},
+
+ {id:'yuji',name:'Yuji Itadori',rarity:'raro',hp:6000,skills:[['Soco',50,1,.30],['Punho Divergente',200,2,.30],['Kokushen',500,5,.30]]},
+ {id:'megumi',name:'Megumi Fushiguro',rarity:'raro',hp:5600,skills:[['Cães Divinos',170,1],['Nue',300,3],['Elefante Máximo',430,4]]},
+ {id:'choso',name:'Choso',rarity:'raro',hp:5900,skills:[['Supernova',190,1],['Perfuração de Sangue',360,3]]},
+ {id:'mahito',name:'Mahito',rarity:'raro',hp:5700,skills:[['Transfiguração',180,1],['Polimorfismo',380,3]]},
+ {id:'jogo',name:'Jogo',rarity:'raro',hp:5800,skills:[['Brasa',190,1],['Meteoro',400,4]]},
+ {id:'hanami',name:'Hanami',rarity:'raro',hp:6100,skills:[['Raízes',170,1],['Broto de Desastre',390,4]]},
+ {id:'dagon',name:'Dagon',rarity:'raro',hp:6200,skills:[['Água',180,1],['Peixes do Domínio',400,4]]},
+ {id:'naoya',name:'Naoya Zenin',rarity:'raro',hp:5500,skills:[['Projeção',210,1],['Velocidade',400,3]]},
+ {id:'higuruma',name:'Hiromi Higuruma',rarity:'raro',hp:5700,skills:[['Martelo',180,1],['Sentença',420,4]]},
+ {id:'reiji',name:'Reggie Star',rarity:'raro',hp:5600,skills:[['Recibo',170,1],['Reprodução',380,3]]},
+
+ {id:'yuta',name:'Yuta Okkotsu',rarity:'epico',hp:6500,skills:[['Katana',220,1],['Rika',470,3],['Cópia',600,5]]},
+ {id:'hakari',name:'Kinji Hakari',rarity:'epico',hp:6800,skills:[['Punho',210,1],['Jackpot',520,5]]},
+ {id:'toji',name:'Toji Fushiguro',rarity:'epico',hp:6700,skills:[['Lança Invertida',240,1],['Inventário Oculto',540,4]]},
+ {id:'geto',name:'Suguru Geto',rarity:'epico',hp:6400,skills:[['Maldição',220,1],['Uzumaki',550,5]]},
+ {id:'uraume',name:'Uraume',rarity:'epico',hp:6300,skills:[['Gelo',230,1],['Formação de Gelo',520,4]]},
+ {id:'yorozu',name:'Yorozu',rarity:'epico',hp:6500,skills:[['Construção',230,1],['Armadura',500,4]]},
+ {id:'kashimo',name:'Hajime Kashimo',rarity:'epico',hp:6600,skills:[['Eletricidade',240,1],['Descarga',540,4]]},
+ {id:'makiAwakened',name:'Maki Zenin Desperta',rarity:'epico',hp:7000,skills:[['Lâmina',260,1],['Sentido Celestial',560,4]]},
+ {id:'jogoMax',name:'Jogo Máximo',rarity:'epico',hp:6700,skills:[['Vulcão',250,1],['Meteoro Máximo',580,5]]},
+ {id:'mahitoTrue',name:'Mahito Completo',rarity:'epico',hp:6800,skills:[['Alma',240,1],['Metamorfose',570,5]]},
+
+ {id:'gojoYoung',name:'Gojo Jovem',rarity:'lendario',hp:7200,skills:[['Azul',280,1],['Vermelho',580,3],['Infinito',0,4]]},
+ {id:'yutaRika',name:'Yuta + Rika',rarity:'lendario',hp:7500,skills:[['Rika',300,1],['Amor Verdadeiro',700,5]]},
+ {id:'kenjaku',name:'Kenjaku',rarity:'lendario',hp:7300,skills:[['Maldição',280,1],['Uzumaki',650,4]]},
+ {id:'yuki',name:'Yuki Tsukumo',rarity:'lendario',hp:7600,skills:[['Massa',320,1],['Garuda',680,4]]},
+ {id:'hakariJackpot',name:'Hakari Jackpot',rarity:'lendario',hp:8200,skills:[['Punho',300,1],['Imortalidade',0,5]]},
+ {id:'kashimoMBA',name:'Kashimo: Técnica Máxima',rarity:'lendario',hp:7900,skills:[['Raio',330,1],['Besta Elétrica',720,5]]},
+ {id:'tojiAssassin',name:'Toji Assassino',rarity:'lendario',hp:7800,skills:[['Lança',320,1],['Golpe Celestial',700,4]]},
+ {id:'mahoraga',name:'Mahoraga',rarity:'lendario',hp:8500,skills:[['Espada',300,1],['Adaptação',0,5]]},
+ {id:'sukuna15',name:'Sukuna 15 Dedos',rarity:'lendario',hp:8000,skills:[['Corte',330,1],['Flecha',720,5]]},
+ {id:'yujiAwakened',name:'Yuji Desperto',rarity:'lendario',hp:7900,skills:[['Soco Negro',330,1],['Impacto da Alma',680,4]]},
+
+ {id:'gojo',name:'Satoru Gojo',rarity:'mitico',hp:9000,skills:[['Azul',400,1],['Vermelho',800,3],['Roxo',1300,6]]},
+ {id:'sukuna',name:'Ryomen Sukuna',rarity:'mitico',hp:9500,skills:[['Desmantelar',430,1],['Corte',850,3],['Santuário',1500,6]]},
+ {id:'sukunaHeian',name:'Sukuna Forma Heian',rarity:'mitico',hp:10000,skills:[['Corte Mundial',500,1],['Fogo',950,4],['Santuário',1600,6]]},
+ {id:'gojoAwakened',name:'Gojo Despertado',rarity:'mitico',hp:9800,skills:[['Azul',450,1],['Vermelho',900,3],['Roxo',1500,6]]},
+ {id:'sukunaMegumi',name:'Sukuna Megumi',rarity:'mitico',hp:9800,skills:[['Dez Sombras',450,1],['Mahoraga',950,5],['Santuário',1500,6]]},
+ {id:'yutaAwakened',name:'Yuta Despertado',rarity:'mitico',hp:9200,skills:[['Cópia',430,1],['Rika',900,4],['Domínio',1400,6]]},
+ {id:'yujiComplete',name:'Yuji Despertado Completo',rarity:'mitico',hp:9300,skills:[['Soco Negro',450,1],['Corte da Alma',900,4],['Impacto Final',1400,6]]},
+ {id:'mahoragaAdapted',name:'Mahoraga Adaptado',rarity:'mitico',hp:10500,skills:[['Espada',450,1],['Adaptação',1000,5]]},
+ {id:'takaba',name:'Fumihiko Takaba',rarity:'mitico',hp:8500,skills:[['Comédia',500,1],['Realidade Cômica',1200,6]]},
+ {id:'rikaTrue',name:'Rika Verdadeira',rarity:'mitico',hp:9000,skills:[['Garra',430,1],['Manifestação',1100,5]]}
+];
+
+let state=JSON.parse(localStorage.getItem('animeBattleV1')||'null')||{
+ coins:0, inventory:{}, nickname:'Jogador', codeUsed:[], selected:null, wins:{easy:0,medium:0,hard:0}, freeSpinUsed:false, openRarity:null
+};
+// Migração para contas antigas: a moeda já existente é preservada, mas o giro grátis é controlado separadamente.
+if(typeof state.freeSpinUsed!=='boolean') state.freeSpinUsed=false;
+if(!state.wins) state.wins={easy:0,medium:0,hard:0};
+function save(){localStorage.setItem('animeBattleV1',JSON.stringify(state));updateCoins()}
+function updateCoins(){let e=document.getElementById('coins');if(e)e.textContent=state.coins}
+function toast(t){let e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
+function go(page){render(page)}
+function rarityWeight(){let r=Math.random()*100,s=0;for(const x of rarities){s+=x.chance;if(r<s)return x.id}}
+function pickChar(r){let pool=chars.filter(c=>c.rarity===r);return pool[Math.floor(Math.random()*pool.length)]}
+function addObtained(c){let old=state.inventory[c.id]||0;state.inventory[c.id]=old+1;if(old>=1){state.coins++;return true}if(!state.selected)state.selected=c.id;return false}
+function spin(){
+ if(!state.freeSpinUsed){state.freeSpinUsed=true;let c=pickChar(rarityWeight()),dup=addObtained(c);save();showResult(c,dup,true);return}
+ if(state.coins<3){toast('Você precisa de 3 moedas!');return}
+ state.coins-=3;let c=pickChar(rarityWeight()),dup=addObtained(c);save();showResult(c,dup,false)
+}
+function tenSpin(){
+ if(state.coins<30){toast('Você precisa de 30 moedas!');return}
+ state.coins-=30;let results=[];
+ for(let i=0;i<10;i++)results.push(pickChar(rarityWeight()));
+ if(!results.some(c=>['epico','lendario','mitico'].includes(c.rarity)))results[0]=pickChar('epico');
+ let dup=0;results.forEach(c=>{if(addObtained(c))dup++});save();showMulti(results,10,dup)
+}
+function hundredSpin(){
+ if(state.coins<300){toast('Você precisa de 300 moedas!');return}
+ state.coins-=300;let results=[];
+ for(let i=0;i<100;i++)results.push(pickChar(rarityWeight()));
+ if(!results.some(c=>['epico','lendario','mitico'].includes(c.rarity)))results[Math.floor(Math.random()*100)]=pickChar('epico');
+ let dup=0;results.forEach(c=>{if(addObtained(c))dup++});save();showMulti(results,100,dup)
+}
+function showResult(c,dup,free){
+ document.getElementById('screen').innerHTML=`<div class="screen"><button class="smallBtn back" onclick="go('roulette')">← Roleta</button><div class="card roulette"><div class="orb">?</div><div class="rarity ${c.rarity}">${rarities.find(r=>r.id===c.rarity).name}</div><div class="resultName">${c.name}</div><p class="muted">${free?'🎁 Primeiro giro grátis!':dup?'🔁 Repetido: +1 moeda.':'Novo personagem obtido!'}</p><button class="bigBtn" onclick="go('inventory')">Ver inventário</button></div></div>`;
+}
+function showMulti(results,n,dup){let counts={};results.forEach(c=>counts[c.rarity]=(counts[c.rarity]||0)+1);document.getElementById('screen').innerHTML=`<div class="screen"><button class="smallBtn back" onclick="go('roulette')">← Voltar</button><div class="card"><h2>🎰 Resultado x${n}</h2><p class="muted">${dup} repetidos devolveram ${dup} moeda(s).</p><div class="list">${rarities.filter(r=>counts[r.id]).map(r=>`<div class="item"><span class="${r.id}">${r.name}</span><b>${counts[r.id]}</b></div>`).join('')}</div><button class="bigBtn" onclick="go('inventory')">Ver inventário</button></div></div>`}
+function showResult(c){
+ document.getElementById('screen').innerHTML=`<div class="screen"><button class="smallBtn back" onclick="go('roulette')">← Roleta</button><div class="card roulette"><div class="orb">?</div><div class="rarity ${c.rarity}">${rarities.find(r=>r.id===c.rarity).name}</div><div class="resultName">${c.name}</div><p class="muted">Novo personagem obtido!</p><button class="bigBtn" onclick="go('inventory')">Ver inventário</button></div></div>`;
+}
+function render(page){
+ updateCoins();
+ const s=document.getElementById('screen');
+ if(page==='home')s.innerHTML=`<div class="screen"><div class="card"><h1>Anime Battle</h1><p class="muted">V1 • Jujutsu Kaisen</p><p>Comece com sua primeira moeda, consiga personagens e teste suas habilidades.</p></div><div class="grid">
+ <button class="menuBtn" onclick="go('play')">⚔️<br>Jogar</button><button class="menuBtn" onclick="go('roulette')">🎰<br>Roletar</button>
+ <button class="menuBtn" onclick="go('inventory')">🎒<br>Inventário</button><button class="menuBtn" onclick="go('options')">⚙️<br>Opções</button></div></div>`;
+ if(page==='roulette')s.innerHTML=`<div class="screen"><div class="card"><h2>🎰 Roleta</h2><p class="muted">O primeiro giro é grátis. Depois, cada giro custa 3 moedas. Personagem repetido devolve 1 moeda.</p><div class="list">${rarities.map(r=>`<div class="item"><span class="${r.id}">${r.name}</span><b>${r.chance}%</b></div>`).join('')}</div><button class="bigBtn" onclick="spin()">🎁 ${state.freeSpinUsed?'Girar • 🪙 3':'PRIMEIRO GIRO GRÁTIS'}</button><button class="bigBtn" style="background:#3c2d85" onclick="tenSpin()">Girar x10 • 🪙 30</button><button class="bigBtn" style="background:#6b45b8" onclick="hundredSpin()">💎 Girar x100 • 🪙 300<br><span class="muted">Pelo menos 1 Épico ou superior garantido</span></button></div></div>`;
+ if(page==='inventory')renderInventory();
+ if(page==='options')s.innerHTML=`<div class="screen"><div class="card"><h2>⚙️ Opções</h2><label>Apelido</label><input id="nick" value="${state.nickname}" maxlength="20"><button class="bigBtn" onclick="state.nickname=document.getElementById('nick').value||'Jogador';save();toast('Apelido salvo!')">Salvar apelido</button></div>
+ <div class="card"><h2>🎟️ Código</h2><p class="muted">V1: códigos têm 5 caracteres.</p><input id="code" maxlength="5" placeholder="EX: A1B2C"><button class="bigBtn" onclick="redeem()">Resgatar</button></div>
+ <div class="card"><h2>👤 Conta</h2><p class="muted">A conta local continua neste navegador. O multiplayer agora usa um servidor real para as partidas online.</p><button class="smallBtn danger" onclick="localStorage.removeItem('animeBattleV1');location.reload()">Resetar V1</button></div></div>`;
+ if(page==='play')s.innerHTML=`<div class="screen"><div class="card"><h2>⚔️ Jogar</h2><button class="menuBtn" style="width:100%;margin-bottom:10px" onclick="go('test')">🎯 Testar<br><span class="muted">Boneco de treino que não ataca</span></button>
+ <button class="menuBtn" style="width:100%;margin-bottom:10px" onclick="go('offline')">🤖 Offline<br><span class="muted">Lute contra uma IA</span></button>
+ <button class="menuBtn" style="width:100%" onclick="go('online')">🌐 Online<br><span class="muted">Criar ou entrar em sala</span></button></div></div>`;
+ if(page==='test')battle('test');
+ if(page==='offline')s.innerHTML=`<div class="screen"><div class="card"><h2>🤖 Offline</h2><p>Escolha a dificuldade.</p><div class="grid"><button class="menuBtn" onclick="startOffline('easy')">Fácil<br>🏆 ${state.wins.easy||0} vitórias<br>🪙 +1 a cada 10 vitórias</button><button class="menuBtn" onclick="startOffline('medium')">Médio<br>🏆 ${state.wins.medium||0} vitórias<br>🪙 +1 a cada 5 vitórias</button><button class="menuBtn" onclick="startOffline('hard')">Difícil<br>🏆 ${state.wins.hard||0} vitórias<br>🪙 +1 a cada 3 vitórias</button></div></div></div>`;
+ if(page==='online')s.innerHTML=`<div class="screen"><div class="card"><h2>🌐 Online Real</h2><p class="muted">Partidas em tempo real. O servidor controla turnos, HP, cooldowns e resultado.</p><label class="muted">Modo</label><select id="onlineMode" class="bigBtn" style="width:100%;margin:7px 0 10px"><option value="1v1">⚔️ 1v1</option><option value="2v2">👥 2v2 (estrutura pronta)</option><option value="3v3">👥 3v3 (estrutura pronta)</option><option value="4v4">👥 4v4 (estrutura pronta)</option><option value="ffa">🔥 Todos contra todos (estrutura pronta)</option></select><button class="bigBtn" onclick="createRoom()">🏠 Criar sala</button><input id="room" maxlength="6" placeholder="Código da sala" style="text-transform:uppercase"><button class="bigBtn" onclick="joinRoom()">🚪 Entrar na sala</button><div id="onlineStatus" class="log">Servidor: desconectado</div></div></div>`;
+}
+function charLevel(id){return Math.min(10,state.inventory[id]||0)}
+function maxed(id){return charLevel(id)>=10}
+function renderInventory(){
+ const s=document.getElementById('screen');
+ const sections=rarities.map(r=>{let owned=chars.filter(c=>c.rarity===r.id && state.inventory[c.id]);let open=state.openRarity===r.id;return `<div class="raritySection"><div class="rarityHeader" onclick="state.openRarity=state.openRarity==='${r.id}'?null:'${r.id}';render('inventory')"><span class="${r.id}">${r.name}</span><b>${owned.length}/${chars.filter(c=>c.rarity===r.id).length} ${open?'▲':'▼'}</b></div>${open?`<div class="charGrid">${owned.length?owned.map(c=>`<div class="miniChar" onclick="characterProfile('${c.id}')"><div class="profileOrb">${c.name[0]}</div><b>${c.name}</b><br><span class="${c.rarity}">x${state.inventory[c.id]}</span></div>`).join(''):'<p class="muted" style="padding:10px">Nenhum personagem dessa raridade.</p>'}</div>`:''}</div>`}).join('');
+ const total=Object.values(state.inventory).reduce((a,b)=>a+b,0);
+ s.innerHTML=`<div class="screen"><div class="card"><h2>🎒 Inventário</h2><p class="muted">${Object.values(state.inventory).filter(v=>v>0).length} personagens • ${total} cópias</p>${sections}</div></div>`;
+}
+function characterProfile(id){
+ const c=chars.find(x=>x.id===id);if(!c)return;const lv=charLevel(id),req=[1,3,5,10];
+ let upgrades=`<div class="upgrade">🔓 <b>Nível 1</b><br>Habilidades básicas desbloqueadas.</div>`;
+ if(c.id==='megumi') upgrades+=`<div class="upgrade ${lv>=3?'':'locked'}">${lv>=3?'🔓':'🔒'} <b>3 Megumis:</b> novo Shikigami desbloqueado.</div><div class="upgrade ${lv>=5?'':'locked'}">${lv>=5?'🔓':'🔒'} <b>5 Megumis:</b> habilidade aprimorada e maior dano.</div><div class="upgrade ${lv>=10?'':'locked'}">${lv>=10?'🔓':'🔒'} <b>10 Megumis:</b> 👑 ULTIMATE desbloqueada. Começa em recarga e usa o mini-game de várias linhas.</div>`;
+ else upgrades+=`<div class="upgrade ${lv>=3?'':'locked'}">${lv>=3?'🔓':'🔒'} <b>3 cópias:</b> melhoria de habilidade.</div><div class="upgrade ${lv>=5?'':'locked'}">${lv>=5?'🔓':'🔒'} <b>5 cópias:</b> habilidade aprimorada.</div><div class="upgrade ${lv>=10?'':'locked'}">${lv>=10?'🔓':'🔒'} <b>10 cópias:</b> evolução máxima / Ultimate.</div>`;
+ const evolved=battleCharacter(c);const skills=evolved.skills.map((sk,i)=>`<div class="skill"><b>${sk[0]}</b>${sk[3]==='ultimate'?' 👑':''}<br><span class="muted">${sk[1]} dano • CD ${sk[2]} • 🎯 crítico por precisão</span></div>`).join('');const hpBonus=evolved.hp-c.hp;
+ document.getElementById('screen').innerHTML=`<div class="screen"><button class="smallBtn back" onclick="go('inventory')">← Inventário</button><div class="card" style="text-align:center"><div class="profileOrb">${c.name[0]}</div><h2>${c.name}</h2><span class="${c.rarity}">${rarities.find(r=>r.id===c.rarity).name}</span><p>❤️ ${evolved.hp} HP • Cópias: ${lv}/10</p><p class="muted">Progressão ativa: +${Math.round((evolved.hp/c.hp-1)*100)}% HP • dano das habilidades evoluído${lv>=5?' • CD da 2ª habilidade reduzido':''}${lv>=10?' • Ultimate desbloqueada':''}</p><button class="smallBtn" onclick="selectChar('${c.id}')">${state.selected===c.id?'✓ Selecionado':'Selecionar para lutar'}</button></div><div class="card"><h3>⚔️ Habilidades</h3>${skills}</div><div class="card"><h3>⬆️ Progressão</h3>${upgrades}</div></div>`;
+}
+function selectChar(id){state.selected=id;save();toast('Personagem selecionado!');characterProfile(id)}
+
+const ULT_TYPES={gojo:'void',yuji_desperto:'sequence',yuta_desperto:'love',satoru_gojo:'void',ryomen_sukuna:'cuts',sukuna_heian:'cuts',sukuna_megumi:'multi',mahoraga_adaptado:'multi',rika_verdadeira:'claw',megumi:'multi'};
+
+function skillDescription(name,id){
+ const n=String(name||'').toLowerCase();
+ const map=[
+  [/azul/,'Concentra uma esfera de energia azul que atrai o alvo e comprime o espaço ao redor do impacto.'],
+  [/vermelho/,'Libera uma descarga repulsiva que explode no contato e arremessa a energia contra o inimigo.'],
+  [/roxo/,'Une duas forças opostas em uma massa violeta que atravessa a arena e desintegra a defesa no caminho.'],
+  [/infinito|vazio infinito/,'Manipula a distância entre os combatentes e cria uma proteção que anula o próximo dano recebido.'],
+  [/santuário/,'Marca a área de combate e desfere cortes sucessivos em vários pontos do alvo.'],
+  [/kokushen|black flash|soco negro/,'Um golpe físico sincronizado com energia amaldiçoada concentrada no instante do impacto.'],
+  [/garra/,'Uma manifestação de garras avança em sequência e rasga o alvo em múltiplos pontos.'],
+  [/cães|cão/,'Invoca um shikigami veloz para perseguir o alvo e atacar com uma investida precisa.'],
+  [/nue/,'Convoca uma criatura alada que mergulha sobre o inimigo e descarrega energia durante o ataque.'],
+  [/elefante|água/,'Cria uma massa de água ou força pesada que cai sobre o campo e pressiona o inimigo.'],
+  [/sangue|perfuração|supernova|ferrão|ferroada/,'Condensa energia em um projétil preciso que perfura a defesa e deixa uma pressão contínua no alvo.'],
+  [/gelo|congel|formação/,'Forma estruturas congelantes que avançam pelo campo e reduzem a mobilidade do inimigo.'],
+  [/fogo|brasa|vulcão|meteoro/,'Converte energia em calor e lança uma explosão incandescente contra o alvo.'],
+  [/raio|eletric|descarga|besta elétrica/,'Acumula carga elétrica e libera um arco de energia que atinge o adversário.'],
+  [/corte|espada|katana|lâmina|lança|desmantelar|flecha|iaido/,'Concentra força na arma e desfere um corte rápido em uma linha definida.'],
+  [/soco|punho|martelo|ataque|investida|golpe/,'Avança em direção ao inimigo e concentra a força no ponto exato do impacto.'],
+  [/barreira|cortina|domínio simples/,'Ergue uma defesa técnica que controla o espaço e reduz a vantagem do adversário.'],
+  [/maldição|veneno/,'Aplica uma energia contaminante que permanece no alvo e aumenta a pressão nos turnos seguintes.'],
+  [/alma|transfiguração|polimorfismo|metamorfose/,'Interfere na forma do alvo e transforma energia em um efeito que ultrapassa a defesa física.'],
+  [/sombra|adaptação|mahoraga/,'Invoca uma resposta adaptativa que aprende com o combate e modifica a defesa do usuário.'],
+  [/rika|amor verdadeiro|manifestação/,'Manifesta uma entidade de energia concentrada que ataca junto ao usuário e amplia o alcance da técnica.'],
+  [/cópia/,'Registra uma técnica observada e a reproduz em uma versão adaptada ao estilo do usuário.'],
+  [/comédia|realidade cômica/,'Transforma uma ideia absurda em efeito de combate, alterando momentaneamente as regras do confronto.'],
+  [/jackpot|imortalidade/,'Libera uma sequência de energia que aumenta a resistência e mantém o usuário ativo por mais tempo.'],
+  [/projeção|velocidade/,'Divide o movimento em uma sequência acelerada, criando um ataque difícil de acompanhar.'],
+  [/recibo|reprodução/,'Materializa uma possibilidade registrada e a converte em uma ação ofensiva imediata.'],
+  [/construção|armadura/,'Constrói matéria energética para formar uma arma ou proteção adaptada ao momento.'],
+  [/massa|garuda/,'Amplifica o peso e a força do golpe, criando uma trajetória de impacto concentrada.'],
+  [/máscara|bestas/,'Canaliza uma manifestação espiritual para atacar em um padrão imprevisível.'],
+  [/soco|punho/,'Um ataque corpo a corpo direto que concentra toda a força no contato.']
+ ];
+ for(const [rx,d] of map) if(rx.test(n)) return d;
+ return `A técnica ${name} converte a energia do usuário em um ataque próprio, com alcance e ritmo definidos pela sua execução.`;
+}
+function skillGameType(sk,index=0){
+ const n=String(sk?.[0]||'').toLowerCase();
+ if(/santuário|roxo|domínio/.test(n)) return 'target';
+ if(/kokushen|soco negro|punho|soco|martelo|ataque|investida/.test(n)) return 'mash';
+ if(/cópia|adaptação|mah[oó]raga|memória|recibo/.test(n)) return 'memory';
+ if(/gelo|água|barreira|cortina|infinito/.test(n)) return 'dodge';
+ if(/fogo|brasa|vulcão|meteoro|vermelho/.test(n)) return 'charge';
+ if(/sangue|perfuração|flecha|lança|espada|katana|lâmina|corte/.test(n)) return 'sequence';
+ if(/raio|eletric|descarga|velocidade|projeção/.test(n)) return 'rhythm';
+ const h=[...String(sk?.[0]||'')].reduce((a,c)=>a+c.charCodeAt(0),index*17);
+ return ['timing','target','mash','sequence','rhythm','charge','dodge','memory'][h%8];
+}
+const ULT_NAMES={
+ miwa:'Círculo Final do Novo Estilo',mai:'Bala Zero Absoluta',momo:'Vórtice da Bruxa Celeste',ijichi:'Cortina: Selo Completo',junpei:'Maré do Veneno',shoko:'Reversão Vital Suprema',haruta:'Milagre: Última Chance',remi:'Armadilha do Ferrão Final',rin:'Sobrecarga Açucarada',sasaki:'Investida do Despertar',
+ toge:'Palavra Amaldiçoada: Ruína',nobara:'Ressonância: Boneca Final',kamo:'Sangue Penetrante Supremo',mechamaru:'Modo Absoluto: Canhão Máximo',maki:'Arsenal Zenin: Corte Final',nanami:'Hora Extra: Razão 7:3',mei:'Corvo Negro: Sacrifício',kusakabe:'Domínio Simples: Lâmina Vazia',todo:'Boogie Woogie: Troca Impossível',ino:'Bestas Auspiciosas: Quarta Face',
+ yuji:'Sequência do Kokushen',megumi:'Jardim das Sombras: General Adaptado',choso:'Supernova: Maré Carmesim',mahito:'Alma: Forma Irreconhecível',jogo:'Meteorito do Vulcão Final',hanami:'Jardim do Desastre',dagon:'Maré do Domínio',naoya:'Projeção: Velocidade Zero',higuruma:'Sentença: Veredito Final',reiji:'Reprodução: Mil Recibos',
+ yuta:'Raio do Amor Verdadeiro',hakari:'Jackpot: Cinco Minutos de Sorte',toji:'Inventário Oculto: Arsenal Zero',geto:'Uzumaki: Espiral de Mil Maldições',uraume:'Palácio de Gelo Absoluto',yorozu:'Construção: Armadura Perfeita',kashimo:'Besta Elétrica: Descarga Final',makiAwakened:'Sentido Celestial: Lâmina Perfeita',jogoMax:'Vulcão: Nascimento do Meteoro',mahitoTrue:'Metamorfose: Alma Completa',
+ gojoYoung:'Infinito: Horizonte Azul',yutaRika:'Rika: Vínculo do Amor',kenjaku:'Uzumaki: Abismo das Maldições',yuki:'Garuda: Massa Estelar',hakariJackpot:'Imortalidade: Jackpot Eterno',kashimoMBA:'Besta Elétrica: Corpo de Raio',tojiAssassin:'Golpe Celestial: Caçador Invisível',mahoraga:'Adaptação: Roda do Acerto',sukuna15:'Flecha: Incêndio Maldito',yujiAwakened:'Impacto da Alma: Punho Desperto',
+ gojo:'Vazio Infinito',sukuna:'Santuário: Mil Cortes',sukunaHeian:'Santuário: Fogo Divino',gojoAwakened:'Roxo: Colapso do Infinito',sukunaMegumi:'Dez Sombras: Rei Adaptado',yutaAwakened:'Raio do Amor: Cópia Final',yujiComplete:'Sequência Final do Kokushen',mahoragaAdapted:'Adaptação Final: Roda Completa',takaba:'Realidade Cômica: Piada Impossível',rikaTrue:'Garra: Manifestação Suprema'
+};
+function ultimateMeta(c){let type=skillGameType(c.skills[c.skills.length-1],c.skills.length-1);if(/gojo/i.test(c.id)||c.id==='gojoYoung')type='dodge';if(c.id==='gojo')type='target';if(c.id==='yutaAwakened'||c.id==='yutaRika')type='rhythm';if(c.id==='yuji'||c.id==='yujiComplete'||c.id==='yujiAwakened')type='sequence';if(c.id==='rikaTrue')type='mash';let name=ULT_NAMES[c.id]||`Despertar: ${c.name}`;return {type,name,desc:`A técnica suprema de ${c.name}. Execute o minigame para liberar seu efeito máximo.`};}
+function addBattleStatus(b,key,value){b.status=b.status||{};b.status[key]=value;}
+function applySpecialTechnique(b,sk,damage){const n=sk[0].toLowerCase();b.status=b.status||{};
+ if(n.includes('infinito')||n.includes('vazio')){b.status.invulnerable=1;b.log+=' 🌀 Proteção espacial ativa: o próximo dano é anulado.';}
+ if(n.includes('santuário')){b.status.enemyBleed=2;b.log+=' 🩸 O alvo foi marcado por cortes por 2 turnos.';}
+ if(n.includes('adaptação')){b.status.adapt=2;b.log+=' 🛡️ Adaptação reduziu o próximo dano recebido.';}
+ if(n.includes('amor')||n.includes('rika')){b.player.hp=Math.min(b.player.maxHp,b.player.hp+Math.round(damage*.18));b.log+=' 💙 A energia da manifestação restaurou parte do HP.';}
+ if(n.includes('jackpot')||n.includes('imortalidade')){b.status.invulnerable=1;b.log+=' 🎰 Jackpot: o próximo dano foi protegido.';}
+ if(n.includes('sequência')){b.status.combo=2;b.log+=' 👊 A sequência deixou um segundo impacto preparado.';}
+}
+function ultimateType(sk){return sk&&sk[3]&&['ultimate','multi','sequence','love','void','cuts','claw','timing','target','mash','rhythm','charge','dodge','memory'].includes(sk[3])?sk[3]:'normal'}
+function miniLabel(type){return {timing:'PARE NO PONTO CERTO',target:'ACERTE O ALVO',mash:'CARREGUE O IMPACTO',sequence:'SIGA A SEQUÊNCIA',rhythm:'SIGA O RITMO',charge:'CARREGUE A ENERGIA',dodge:'DESVIE DOS MARCADORES',memory:'REPITA O PADRÃO'}[type]||'EXECUTE A TÉCNICA';}
+function minigameMarkup(type){const b=battleState||{},m=b.mini||{};
+ if(type==='mash')return `<div class="critGame"><b>👊 ${miniLabel(type)}</b><p class="muted">Toque ${m.goal||8} vezes antes do tempo acabar. ${m.count||0}/${m.goal||8}</p><div class="miniMeter"><i style="width:${Math.min(100,((m.count||0)/(m.goal||8))*100)}%"></i></div><button class="critBtn" onclick="miniAction('mash')">⚡ IMPACTAR</button></div>`;
+ if(type==='sequence')return `<div class="critGame"><b>⚔️ ${miniLabel(type)}</b><p class="muted">Clique na ordem correta.</p><div class="sequenceBtns">${(m.order||[0,1,2,3]).map((v,i)=>`<button onclick="miniAction('sequence',${i})">${v+1}</button>`).join('')}</div><small class="muted">Próximo: ${(m.order||[0,1,2,3])[(m.next||0)]!==undefined?(m.order||[0,1,2,3])[(m.next||0)]+1:'✓'}</small></div>`;
+ if(type==='memory')return `<div class="critGame"><b>🧠 ${miniLabel(type)}</b><p class="muted">Memorize: <strong>${m.patternText||'◆ ● ▲'}</strong></p><div class="sequenceBtns">${['◆','●','▲','■'].map((x,i)=>`<button onclick="miniAction('memory',${i})">${x}</button>`).join('')}</div><small class="muted">${m.memoryPhase?'Memorize o padrão!':'Repita a sequência.'}</small></div>`;
+ if(type==='target')return `<div class="critGame"><b>🎯 ${miniLabel(type)}</b><p class="muted">Toque no alvo móvel para acertar.</p><div class="targetField" id="targetField"><button class="targetDot" id="targetDot" onclick="miniAction('target')">✦</button></div></div>`;
+ if(type==='charge')return `<div class="critGame"><b>🔥 ${miniLabel(type)}</b><p class="muted">Toque para carregar sem ultrapassar a zona vermelha.</p><div class="chargeMeter"><i style="width:${m.charge||0}%"></i></div><button class="critBtn" onclick="miniAction('charge')">🔥 CARREGAR</button><button class="smallBtn" onclick="miniAction('release')">LIBERAR</button></div>`;
+ if(type==='dodge')return `<div class="critGame"><b>🛡️ ${miniLabel(type)}</b><p class="muted">Escolha a direção segura antes do marcador atingir você.</p><div class="dodgeRow">${['⬅️','⬆️','➡️'].map((x,i)=>`<button onclick="miniAction('dodge',${i})">${x}</button>`).join('')}</div><small class="muted">Marcador: ${m.danger!==undefined?['⬅️','⬆️','➡️'][m.danger]:'...'}</small></div>`;
+ if(type==='rhythm')return `<div class="critGame"><b>⚡ ${miniLabel(type)}</b><p class="muted">Aperte quando o pulso entrar no círculo.</p><div class="rhythmPulse" id="rhythmPulse"></div><button class="critBtn" onclick="miniAction('rhythm')">⚡ SINCRONIZAR</button></div>`;
+ return `<div class="critGame"><b>🎯 ${miniLabel(type)}</b><p class="muted">Pare a linha dentro da área amarela.</p><div class="critTrack"><div class="critZone"></div><div class="critLine" id="critLine"></div></div><button class="critBtn" onclick="miniAction('timing')">PARAR</button></div>`;
+}
+function startMiniTimer(b){clearInterval(b.critTimer);const type=b.mini.type;
+ if(type==='target'){b.critTimer=setInterval(()=>{if(!battleState||battleState!==b||!b.critActive)return;let d=document.getElementById('targetDot');if(d){d.style.left=(8+Math.random()*78)+'%';d.style.top=(12+Math.random()*62)+'%'}},500);return;}
+ if(type==='dodge'){b.critTimer=setInterval(()=>{b.mini.danger=Math.floor(Math.random()*3);let log=document.querySelector('.log');if(log)log.dataset.danger=b.mini.danger;drawBattle();},650);return;}
+ if(type==='rhythm'){b.critTimer=setInterval(()=>{if(!battleState||battleState!==b||!b.critActive)return;b.mini.pulse=(b.mini.pulse+7)%101;let el=document.getElementById('rhythmPulse');if(el)el.style.transform=`scale(${.65+b.mini.pulse/150})`;},70);return;}
+ if(type==='timing'||type==='charge'){b.critTimer=setInterval(()=>{if(!battleState||battleState!==b||!b.critActive)return;b.mini.pos=(b.mini.pos+(b.mini.dir*3.4));if(b.mini.pos>=96||b.mini.pos<=0)b.mini.dir*=-1;let el=document.getElementById('critLine');if(el)el.style.left=b.mini.pos+'%';},25);}
+}
+function startCritGame(i){let b=battleState;if(!b)return;let sk=b.player.skills[i];let type=skillGameType(sk,i);b.critActive=true;b.pendingSkill=i;b.mini={type,pos:0,dir:1,count:0,goal:8,charge:0,pulse:0,danger:1,next:0,order:[0,1,2,3].sort(()=>Math.random()-.5),pattern:[0,1,2].sort(()=>Math.random()-.5),memoryPhase:false,patternText:''};
+ if(type==='memory'){b.mini.patternText=b.mini.pattern.map(x=>['◆','●','▲','■'][x]).join(' ');b.mini.memoryPhase=true;setTimeout(()=>{if(battleState===b&&b.critActive){b.mini.memoryPhase=false;drawBattle()}},1300)}
+ drawBattle();setTimeout(()=>{if(battleState===b&&b.critActive&&!b.critTimer)startMiniTimer(b)},50);
+}
+function finishMini(ok){let b=battleState;if(!b||!b.critActive)return;clearInterval(b.critTimer);b.critTimer=null;let i=b.pendingSkill;b.critActive=false;b.pendingSkill=null;b.mini=null;performAttack(i,!!ok)}
+function miniAction(action,value){let b=battleState;if(!b||!b.critActive)return;let m=b.mini;
+ if(action==='mash'){m.count++;if(m.count>=m.goal)finishMini(true);else drawBattle();return}
+ if(action==='sequence'){if(value===m.order[m.next]){m.next++;if(m.next>=m.order.length)finishMini(true);else drawBattle()}else{toast('Sequência errada!');finishMini(false)}return}
+ if(action==='memory'){if(m.memoryPhase)return;let expected=m.pattern[m.next];if(value===expected){m.next++;if(m.next>=m.pattern.length)finishMini(true);else drawBattle()}else finishMini(false);return}
+ if(action==='target'){let d=document.getElementById('targetDot');if(d){d.classList.add('targetHit');setTimeout(()=>finishMini(true),180)}return}
+ if(action==='charge'){m.charge=Math.min(100,m.charge+Math.floor(12+Math.random()*14));if(m.charge>=100)finishMini(false);else drawBattle();return}
+ if(action==='release'){finishMini(m.charge>=55&&m.charge<=88);return}
+ if(action==='dodge'){finishMini(value!==m.danger);return}
+ if(action==='rhythm'){finishMini(m.pulse>=35&&m.pulse<=65);return}
+ finishMini(m.pos>=41&&m.pos<=59);
+}
+function battleCharacter(c){
+ let x={...c,skills:c.skills.map(a=>[...a]),hp:c.hp,maxHp:c.hp}; let lv=charLevel(c.id);
+ let hpMult=lv>=10?1.20:lv>=5?1.10:lv>=3?1.05:1, dmgMult=lv>=10?1.40:lv>=5?1.20:lv>=3?1.10:1;
+ x.hp=Math.round(c.hp*hpMult);x.maxHp=x.hp;
+ x.skills=x.skills.map((sk,idx)=>{let a=[...sk];a[1]=Math.round(a[1]*dmgMult);if(lv>=5&&idx===1&&a[2]>1)a[2]--;a[4]=skillDescription(a[0],c.id);return a});
+ if(c.id==='megumi'&&lv>=3&&!x.skills.some(a=>a[0]==='Cão Divino: Totalidade'))x.skills.push(['Cão Divino: Totalidade',Math.round(520*dmgMult),4,'multi',skillDescription('Cão Divino: Totalidade',c.id)]);
+ if(lv>=10&&!x.skills.some(a=>a[3]==='ultimate')){let u=ultimateMeta(c),base=x.skills.reduce((m,a)=>Math.max(m,a[1]),0);x.skills.push([u.name,Math.round(base*1.65),8,u.type,u.desc]);}
+ return x;
+}
+function currentChar(){return chars.find(c=>c.id===state.selected)||chars.find(c=>state.inventory[c.id])}
+let battleState=null;
+function battle(type){
+ let c=currentChar();if(c)c=battleCharacter(c);
+ if(!c){document.getElementById('screen').innerHTML=`<div class="screen"><div class="card"><h2>Você ainda não tem personagem.</h2><button class="bigBtn" onclick="go('roulette')">Ir para a roleta</button></div></div>`;return}
+ if(!battleState||battleState.type!==type){battleState={type,player:c,enemy:{name:'Boneco de Treino',hp:100000,max:100000},cooldowns:{}}}
+ drawBattle();
+}
+function startOffline(diff){
+ let c=currentChar();if(!c){toast('Consiga um personagem primeiro!');return}
+ c=battleCharacter(c);
+ let pool=chars.filter(x=>x.id!==c.id);let enemy=pool[Math.floor(Math.random()*pool.length)];let mult={easy:.65,medium:.9,hard:1.15}[diff];
+ battleState={type:'offline',diff,player:{...c,hp:c.hp},enemy:{...enemy,hp:Math.round(enemy.hp*mult),max:Math.round(enemy.hp*mult)},cooldowns:{},status:{},resolving:false,critActive:false};drawBattle();
+}
+function resetBattle(){let b=battleState;if(!b)return;let original=chars.find(c=>c.id===b.player.id)||b.player;original=battleCharacter(original);b.player={...original,hp:original.hp};b.enemy={...b.enemy,hp:b.enemy.max};b.cooldowns={};b.status={};b.resolving=false;b.critActive=false;b.log='A luta recomeçou!';drawBattle()}
+function showBattleEnd(victory){let title=victory?'🎉 Você venceu!':'💀 Você perdeu!';let text=victory?'Você derrotou o inimigo.':'Seu HP chegou a zero.';document.getElementById('screen').innerHTML=`<div class="screen"><div class="card" style="text-align:center"><h1>${title}</h1><p>${text}</p><h2>Jogar de novo?</h2><button class="bigBtn" onclick="resetBattle()">✅ Sim</button><button class="bigBtn" style="background:#24283a" onclick="go('play')">❌ Não</button></div></div>`}
+function reduceCooldowns(b){Object.keys(b.cooldowns).forEach(k=>{if(b.cooldowns[k]>0)b.cooldowns[k]--})}
+function aiTurn(){let b=battleState;if(!b||b.type!=='offline'||b.enemy.hp<=0||b.player.hp<=0)return;let e=b.enemy,s=b.player,aiSkill=e.skills[Math.floor(Math.random()*e.skills.length)],aiDmg=Math.floor(70+Math.random()*140);if(b.status?.invulnerable){aiDmg=0;b.status.invulnerable=0;b.log+=' 🌀 Infinito anulou o dano!'}else if(b.status?.adapt){aiDmg=Math.round(aiDmg*.5);b.status.adapt--;b.log+=' 🛡️ Adaptação reduziu o dano!'}s.hp=Math.max(0,s.hp-aiDmg);if(b.status?.enemyBleed>0){e.hp=Math.max(0,e.hp-80);b.status.enemyBleed--;}b.log+=` ${e.name} usou ${aiSkill[0]} e causou ${aiDmg} de dano.`;drawBattle();setTimeout(()=>triggerEffect('player',aiSkill[0],aiDmg,false),30);if(s.hp<=0){b.resolving=false;showBattleEnd(false);return}setTimeout(()=>{if(battleState===b&&b.enemy.hp>0&&b.player.hp>0){b.resolving=false;drawBattle()}},250)}
+function drawBattle(){
+ let b=battleState;if(!b)return;let s=b.player,e=b.enemy;let busy=b.critActive||b.resolving?'disabled':'';
+ let skillHTML=s.skills.map((sk,i)=>{let typ=ultimateType(sk),game=skillGameType(sk,i);return `<div class="skillCard"><button class="skillBtn" onclick="startAttack(${i})" ${busy||b.cooldowns[i]>0?'disabled':''}>⚔️ ${sk[0]} <span style="float:right">${sk[1]} DMG</span><br><small class="muted">CD ${b.cooldowns[i]||0} • ${sk[4]||skillDescription(sk[0],s.id)}${typ!=='normal'?' • 👑 Ultimate':''}</small></button>${b.critActive&&b.pendingSkill===i?minigameMarkup(game):''}</div>`}).join('');
+ document.getElementById('screen').innerHTML=`<div class="screen"><div class="card"><button class="smallBtn" onclick="go('play')">← Sair</button><h2>⚔️ Batalha</h2><div class="battleArena"><div class="fighter"><div class="fighterName">${s.name}</div><div class="fighterOrb" id="playerOrb"><div class="effect"></div><div class="damageFloat"></div><div class="techFx" id="playerFx"></div><div><div class="orbHp">${Math.max(0,s.hp)} HP</div><div class="orbMax">HP máximo: ${s.maxHp||s.hp}</div></div></div></div><div class="fighter"><div class="fighterName">${e.name}</div><div class="fighterOrb enemyOrb" id="enemyOrb"><div class="effect"></div><div class="damageFloat"></div><div class="techFx" id="enemyFx"></div><div><div class="orbHp">${Math.max(0,e.hp)} HP</div><div class="orbMax">de ${e.max||e.hp} HP</div></div></div></div></div><div class="list">${skillHTML}</div><button class="bigBtn" style="background:#24283a;margin-top:10px" onclick="skipTurn()" ${busy}>⏭️ Pular Turno</button><div class="log" id="log">${b.log||'Escolha uma habilidade ou pule o turno.'}</div></div></div>`;
+ if(b.critActive&&!b.critTimer&&b.mini&&!['sequence','memory','mash','charge','dodge'].includes(b.mini.type))setTimeout(()=>{if(battleState===b&&b.critActive&&!b.critTimer)startMiniTimer(b)},20);
+}
+function startAttack(i){let b=battleState;if(!b||b.critActive||b.resolving||b.enemy.hp<=0||b.player.hp<=0||(b.cooldowns[i]||0)>0)return;startCritGame(i)}
+function stopCritGame(){let b=battleState;if(!b||!b.critActive)return;miniAction(b.mini.type==='timing'?'timing':'release')}
+function performAttack(i,critical){let b=battleState;if(!b||b.resolving||b.critActive)return;let s=b.player,e=b.enemy,sk=s.skills[i];if(!sk||e.hp<=0||s.hp<=0||(b.cooldowns[i]||0)>0)return;b.resolving=true;let damage=Math.round(sk[1]*(critical?2:1));e.hp=Math.max(0,e.hp-damage);b.cooldowns[i]=Math.max(1,sk[2]);reduceOtherCooldowns(b,i);applySpecialTechnique(b,sk,damage);b.log=`${s.name} usou ${sk[0]}${critical?' 🎯 EXECUÇÃO PERFEITA!':''} e causou ${damage} de dano.`;drawBattle();setTimeout(()=>triggerEffect('enemy',sk[0],damage,critical),30);
+ if(e.hp<=0){if(b.type==='offline'){let d=b.diff;state.wins[d]=(state.wins[d]||0)+1;let need={easy:10,medium:5,hard:3}[d];if(state.wins[d]%need===0){state.coins++;b.log+=` 🪙 +1 moeda pela meta de ${need} vitórias!`;}save()}setTimeout(()=>{b.resolving=false;showBattleEnd(true)},650);return}
+ if(b.type==='offline')setTimeout(aiTurn,700);else setTimeout(()=>{if(battleState===b&&b.enemy.hp>0&&b.player.hp>0){b.resolving=false;drawBattle()}},250)}
+function reduceOtherCooldowns(b,used){Object.keys(b.cooldowns).forEach(k=>{if(String(k)!==String(used)&&b.cooldowns[k]>0)b.cooldowns[k]--})}
+function skipTurn(){let b=battleState;if(!b||b.resolving||b.critActive||b.enemy.hp<=0||b.player.hp<=0)return;reduceCooldowns(b);b.log='⏭️ Você pulou o turno. Todos os cooldowns avançaram 1 turno.';drawBattle();if(b.type==='offline')setTimeout(aiTurn,250)}
+function reduceCooldowns(b){Object.keys(b.cooldowns).forEach(k=>{if(b.cooldowns[k]>0)b.cooldowns[k]--})}
+function aiTurn(){let b=battleState;if(!b||b.type!=='offline'||b.enemy.hp<=0||b.player.hp<=0)return;let e=b.enemy,s=b.player,aiSkill=e.skills[Math.floor(Math.random()*e.skills.length)],aiDmg=Math.floor(70+Math.random()*140);if(b.status?.invulnerable){aiDmg=0;b.status.invulnerable=0;b.log+=' 🌀 Proteção anulou o dano!'}else if(b.status?.adapt){aiDmg=Math.round(aiDmg*.5);b.status.adapt--;b.log+=' 🛡️ Adaptação reduziu o dano!'}s.hp=Math.max(0,s.hp-aiDmg);if(b.status?.enemyBleed>0){e.hp=Math.max(0,e.hp-80);b.status.enemyBleed--;}b.log+=` ${e.name} usou ${aiSkill[0]} e causou ${aiDmg} de dano.`;drawBattle();setTimeout(()=>triggerEffect('player',aiSkill[0],aiDmg,false),30);if(s.hp<=0){b.resolving=false;showBattleEnd(false);return}setTimeout(()=>{if(battleState===b&&b.enemy.hp>0&&b.player.hp>0){b.resolving=false;drawBattle()}},250)}
+function attackEffect(skillName){
+ let n=skillName.toLowerCase();
+ if(/corte|espada|katana|lança|lâmina|golpe celestial|desmantelar|flecha/.test(n))return ['slash','⚔️'];
+ if(/fogo|brasa|vulcão|meteoro/.test(n))return ['fire','🔥'];
+ if(/gelo|água|congel/.test(n))return ['ice','❄️'];
+ if(/raio|eletric|descarga/.test(n))return ['lightning','⚡'];
+ if(/sangue|perfuração|supernova|ferroada|ferrão/.test(n))return ['blood','🩸'];
+ if(/azul|vermelho|roxo|energia|domínio|santuário|infinito|barreira|cortina/.test(n))return ['energy','💥'];
+ if(/alma|sombra|mah[oó]raga|maldição|veneno/.test(n))return ['energy','👁️'];
+ if(/soco|punho|martelo|ataque|investida/.test(n))return ['hit','💥'];
+ return ['hit','✨'];
+}
+function triggerEffect(side,skillName,damage,critical){
+ let b=battleState;if(!b)return;let orb=document.getElementById(side+'Orb');if(!orb)return;let field=orb.querySelector('.techFx');let n=skillName.toLowerCase();let html='';
+ if(n.includes('santuário'))html='<div class="techCuts"><i></i><i></i><i></i><i></i><i></i><i></i></div>';
+ else if(n.includes('roxo'))html='<div class="techBalls"><b></b><b></b><b></b></div>';
+ else if(n.includes('azul'))html='<div class="techProjectile big">🔵</div>';
+ else if(n.includes('vermelho'))html='<div class="techBurst red"></div>';
+ else if(n.includes('infinito')||n.includes('vazio'))html='<div class="techShield"></div>';
+ else if(n.includes('kokushen')||n.includes('soco negro'))html='<div class="techBurst crimson"></div><div class="techProjectile">👊</div>';
+ else if(n.includes('garra'))html='<div class="techClaw">🖐️</div>';
+ else if(/fogo|brasa|vulcão|meteoro/.test(n))html='<div class="techBurst fire"></div><div class="techProjectile">🔥</div>';
+ else if(/gelo|água|congel/.test(n))html='<div class="techBurst ice"></div><div class="techProjectile">❄️</div>';
+ else if(/raio|eletric|descarga/.test(n))html='<div class="techLightning">⚡</div>';
+ else if(/sangue|perfuração|supernova|ferrão|ferroada/.test(n))html='<div class="techSlash blood">🩸</div>';
+ else if(/maldição|veneno|alma|transfiguração|polimorfismo/.test(n))html='<div class="techSmoke">☠️</div>';
+ else if(/sombra|adaptação|mah[oó]raga/.test(n))html='<div class="techWheel">◉</div>';
+ else if(/barreira|cortina|domínio/.test(n))html='<div class="techShield blue"></div>';
+ else if(/rika|amor|manifestação/.test(n))html='<div class="techHeart">♥</div>';
+ else html='<div class="techImpact">✦</div>';
+ field.innerHTML=html;let anim=field.firstElementChild;if(anim){void anim.offsetWidth;anim.classList.add('go')}
+ orb.classList.remove('shake');void orb.offsetWidth;orb.classList.add('shake');let fl=orb.querySelector('.damageFloat');if(side==='enemy'&&damage>0){fl.textContent=(critical?'PERFEITO! ':'-')+damage;fl.className='damageFloat';void fl.offsetWidth;fl.classList.add('show')}
+ setTimeout(()=>{field.innerHTML=''},1000);
+}
+
+let onlineSocket=null,onlineRoom=null,onlineToken=localStorage.getItem('animeBattleOnlineToken')||'',onlineState=null;
+let onlineClockTimer=null;
+function startOnlineClock(){clearInterval(onlineClockTimer);onlineClockTimer=setInterval(()=>{if(onlineState&&onlineState.phase==='turn'&&typeof onlineState.timeLeft==='number'){onlineState.timeLeft=Math.max(0,onlineState.timeLeft-1);if(document.querySelector('.screen')&&document.querySelector('.screen').textContent.includes(onlineState.room))onlineDrawBattle();}},1000)}
+function onlineUrl(){if(location.protocol==='file:')return 'ws://localhost:8080';return (location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws'}
+function onlineConnect(cb){if(onlineSocket&&onlineSocket.readyState===WebSocket.OPEN){cb&&cb();return}try{onlineSocket=new WebSocket(onlineUrl())}catch(e){toast('Não foi possível abrir o online.');return}onlineSocket.onopen=()=>{setOnlineStatus('🟢 Conectado ao servidor');cb&&cb()};onlineSocket.onclose=()=>{setOnlineStatus('🔴 Desconectado. Tentando reconectar...');if(onlineRoom)setTimeout(()=>onlineConnect(()=>onlineSend({type:'reconnect',room:onlineRoom,token:onlineToken})),1500)};onlineSocket.onerror=()=>setOnlineStatus('🟠 Erro de conexão');onlineSocket.onmessage=e=>{try{handleOnlineMessage(JSON.parse(e.data))}catch(err){console.error(err)}}}
+function onlineSend(x){if(onlineSocket&&onlineSocket.readyState===WebSocket.OPEN)onlineSocket.send(JSON.stringify(x));else toast('Conectando ao servidor...')}
+function setOnlineStatus(t){let e=document.getElementById('onlineStatus');if(e)e.textContent=t}
+function createRoom(){let mode=document.getElementById('onlineMode')?.value||'1v1';onlineConnect(()=>onlineSend({type:'create',nickname:state.nickname||'Jogador',mode,character:state.selected||currentChar()?.id||'yuji'}))}
+function joinRoom(){let code=(document.getElementById('room')?.value||'').trim().toUpperCase();if(!/^[A-Z0-9]{6}$/.test(code)){toast('O código precisa ter 6 caracteres.');return}onlineConnect(()=>onlineSend({type:'join',room:code,nickname:state.nickname||'Jogador',character:state.selected||currentChar()?.id||'yuji'}))}
+function renderOnlineLobby(){let r=onlineState;if(!r)return;document.getElementById('screen').innerHTML=`<div class="screen"><div class="card"><h2>🏠 Sala ${r.room}</h2><p class="muted">Modo: ${r.mode} • ${r.players.length}/${r.maxPlayers} jogadores</p><h1 style="text-align:center;letter-spacing:7px">${r.room}</h1><div class="list">${r.players.map((p,i)=>`<div class="item"><span>${i===0?'👑 ':''}${p.nickname}</span><span>${p.characterName||p.character||'Escolhendo...'}</span></div>`).join('')}</div>${r.isHost?'<button class="bigBtn" onclick="onlineStart()">▶️ Iniciar partida</button>':'<p class="muted" style="text-align:center">Aguardando o líder iniciar...</p>'}<button class="smallBtn" onclick="onlineLeave()">Sair da sala</button><div class="log">🟢 Conectado. Se a conexão cair, a sala pode ser recuperada pelo token.</div></div></div>`}
+function onlineStart(){onlineSend({type:'start'})}
+function onlineLeave(){onlineSend({type:'leave'});onlineRoom=null;onlineState=null;go('play')}
+function handleOnlineMessage(m){if(m.type==='error'){toast(m.message||'Erro');return}if(m.type==='welcome'){onlineToken=m.token;localStorage.setItem('animeBattleOnlineToken',onlineToken);onlineRoom=m.room;return}if(m.type==='lobby'){onlineRoom=m.room;onlineState=m;renderOnlineLobby();return}if(m.type==='battle'){onlineRoom=m.room;onlineState=m;startOnlineClock();onlineDrawBattle();return}if(m.type==='event'){toast(m.message);return}if(m.type==='ended'){onlineState=m;clearInterval(onlineClockTimer);onlineDrawBattle(true);return}if(m.type==='ping')onlineSend({type:'pong'})}
+function onlineDrawBattle(ended=false){let b=onlineState;if(!b)return;let me=b.players.find(p=>p.selfToken)||b.me;let enemy=b.players.find(p=>!p.selfToken);if(!me)return;let skills=(me.skills||[]).map((sk,i)=>`<div class="skillCard"><button class="skillBtn" onclick="onlineSkill(${i})" ${b.turnResolved||me.cooldowns?.[i]>0||b.phase!=='turn'?'disabled':''}>⚔️ ${sk.name} <span style="float:right">${sk.damage} DMG</span><br><small class="muted">CD ${me.cooldowns?.[i]||0} • ${sk.description||''}</small></button></div>`).join('');let result=ended?`<div class="card" style="text-align:center"><h1>${b.winnerToken===onlineToken?'🎉 Vitória!':'💀 Derrota!'}</h1><p>${b.endReason||'Partida encerrada.'}</p><button class="bigBtn" onclick="go('online')">Voltar ao Online</button></div>`:'';document.getElementById('screen').innerHTML=`<div class="screen"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>🌐 ${b.room}</b><span>Turno ${b.turn||1} • ⏱️ ${b.timeLeft??12}s</span></div><div class="battleArena"><div class="fighter"><div class="fighterName">${me.nickname}</div><div class="fighterOrb"><div><div class="orbHp">${Math.max(0,me.hp)} HP</div><div class="orbMax">${me.maxHp} HP</div></div></div></div><div class="fighter"><div class="fighterName">${enemy?.nickname||'Oponente'}</div><div class="fighterOrb enemyOrb"><div><div class="orbHp">${Math.max(0,enemy?.hp||0)} HP</div><div class="orbMax">${enemy?.maxHp||0} HP</div></div></div></div></div><div class="list">${skills}</div><button class="bigBtn" style="background:#24283a" onclick="onlineSkip()" ${b.phase!=='turn'||b.turnResolved?'disabled':''}>⏭️ Pular turno</button><div class="log">${b.phase==='turn'?(me.actionSubmitted?'✅ Ação enviada. Aguardando oponente...':'Escolha sua ação. As duas ações são resolvidas juntas.'):'Aguardando...'}</div>${result}</div></div>`}
+function onlineSkill(i){onlineSend({type:'action',action:'skill',skill:i,quality:Math.random()<.18?2:1})}
+function onlineSkip(){onlineSend({type:'action',action:'skip'})}
+
+function redeem(){let code=document.getElementById('code').value.trim().toUpperCase();if(code.length!==5){toast('O código precisa ter 5 caracteres.');return}if(state.codeUsed.includes(code)){toast('Código já usado.');return}const rewards={START:'coins',JJK01:'yuji',GOJO1:'gojo',SUKNA:'sukuna'};if(code==='JUNIN'){state.coins+=1000}else if(code==='JHON'||code==='TUTUT'){chars.forEach(c=>state.inventory[c.id]=10);state.selected=state.selected||chars[0].id}else if(code==='START'){state.coins+=5}else if(rewards[code]&&rewards[code]!=='coins'){let c=chars.find(x=>x.id===rewards[code]);addObtained(c)}else{toast('Código inválido.');return}state.codeUsed.push(code);save();toast((code==='JHON'||code==='TUTUT')?'Todos os personagens estão no nível máximo!':code==='JUNIN'?'+1000 moedas!':'Código resgatado!')}
+render('home');
+
+</script>
+<script>if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('/sw.js').catch(()=>{});</script>
+</body>
+</html>

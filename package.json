@@ -1,0 +1,9 @@
+{
+  "name": "anime-battle-mobile-online",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Anime Battle, cliente mobile e servidor WebSocket autoritativo em um único serviço.",
+  "main": "server.js",
+  "scripts": {"start": "node server.js"},
+  "engines": {"node": ">=18"}
+}
